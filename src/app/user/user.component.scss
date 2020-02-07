@@ -15,12 +15,18 @@
   
 .btn1{
     left: 46%;
-    margin-top: 20%;
-    padding : 0px 50px;
+    margin-top: 5%;
+    padding : 0px 75px;
     border: 2px solid rgb(160, 155, 155);
 }
 .btn2{
     left: 46.25%;
     padding : 0px 85px;
     border: 2px solid rgb(160, 155, 155);
+}
+
+agm-map {
+  height: 700px;
+  align-items: center;
+  padding: 0em;
 }

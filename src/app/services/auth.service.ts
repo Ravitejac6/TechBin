@@ -5,7 +5,6 @@ import { AngularFireDatabase, AngularFireList } from '@angular/fire/database';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 
-//import{FirebaseListObservable,FirebaseObjectObservable} from 'angularfire2/database-deprecated';
 @Injectable({
   providedIn: 'root'
 })
@@ -18,6 +17,7 @@ export class AuthService {
       if (user) {
         this.userData = user.uid;
         localStorage.setItem('user', JSON.stringify(this.userData));
+        console.log("Token set");
         JSON.parse(localStorage.getItem('user'));
       } else {
         localStorage.setItem('user', null);
@@ -45,14 +45,14 @@ export class AuthService {
               name: res.user.email,
               arr: firebase.firestore.FieldValue.arrayUnion(this.getRandomSpan())
             })
-            console.log('Yes');
+            console.log('Already logged In');
           }
           else {
             this.af.collection("UID").doc(r).set({
               name: res.user.email,
               arr: firebase.firestore.FieldValue.arrayUnion(this.getRandomSpan())
             })
-            console.log('No');
+            console.log('First time Logged In');
           }
         })
        this.router.navigate(['/login',r]);
@@ -112,11 +112,18 @@ export class AuthService {
       return firebase.auth().signOut().then(function () {
         localStorage.removeItem('user');
         this.router.navigate(['/register']);
-        console.log("Successfully Log Out");
+        console.log("Successfully Logged Out");
       }).catch(function (error) {
         console.log("Error occured");
       });
     })
+  }
+
+
+  isValid(){
+    if(localStorage.getItem('user') != null)
+      return true;
+    return false;
   }
 
 
