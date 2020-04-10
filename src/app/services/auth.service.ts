@@ -9,21 +9,21 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
-
+  res:any;
   userData: any;
   constructor(private db: AngularFireDatabase,
     private router: Router, private afAuth: AngularFireAuth, private af: AngularFirestore, public as: AuthService, public zone: NgZone) {
-    this.afAuth.authState.subscribe(user => {
-      if (user) {
-        this.userData = user.uid;
-        localStorage.setItem('user', JSON.stringify(this.userData));
-        console.log("Token set");
-        JSON.parse(localStorage.getItem('user'));
-      } else {
-        localStorage.setItem('user', null);
-        JSON.parse(localStorage.getItem('user'));
-      }
-    });
+    // this.afAuth.authState.subscribe(user => {
+    //   if (user) {
+    //     this.userData = user.uid;
+    //     localStorage.setItem('user', JSON.stringify(this.userData));
+    //     console.log("Token set");
+    //     JSON.parse(localStorage.getItem('user'));
+    //   } else {
+    //     localStorage.setItem('user', null);
+    //     JSON.parse(localStorage.getItem('user'));
+    //   }
+    // });
 
   }
 
@@ -38,24 +38,26 @@ export class AuthService {
       .then(res => {
         console.log(res);
         let r = res.user.uid;
+        localStorage.setItem('user',r);
         var docref = this.af.collection('UID').doc(r);
         docref.get().subscribe(doc => {
           if (doc.exists) {
             this.af.collection("UID").doc(r).update({
               name: res.user.email,
-              arr: firebase.firestore.FieldValue.arrayUnion(this.getRandomSpan())
+              arr: firebase.firestore.FieldValue.arrayUnion(this.getRandomSpan()),
+              val : this.get_string()
             })
             console.log('Already logged In');
           }
           else {
             this.af.collection("UID").doc(r).set({
               name: res.user.email,
-              arr: firebase.firestore.FieldValue.arrayUnion(this.getRandomSpan())
+              arr: firebase.firestore.FieldValue.arrayUnion(this.getRandomSpan()),
+              val : this.get_string()
             })
             console.log('First time Logged In');
           }
         })
-       this.router.navigate(['/login',r]);
       })
 
   }
@@ -74,7 +76,7 @@ export class AuthService {
   anonymousLogin() {
     this.zone.run(() => {
       this.afAuth.auth.signInAnonymously().then(user => {
-        if (!localStorage.getItem(user.user.uid) ==null) {
+        if (localStorage.getItem('user') ==null) {
             localStorage.setItem('user', user.user.uid);
             this.af.collection("UID").doc(user.user.uid).set({
               uid: user.user.uid,
@@ -120,12 +122,16 @@ export class AuthService {
   }
 
 
-  isValid(){
-    if(localStorage.getItem('user') != null)
-      return true;
-    return false;
+  isLoggedIn(){
+    return !!localStorage.getItem('user');
   }
 
+  string_set(string1){
+    this.res = string1;
+  }
+  get_string() : string{
+    return this.res;
+  }
 
 
 }
